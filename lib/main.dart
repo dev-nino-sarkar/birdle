@@ -60,7 +60,7 @@ class Tile extends StatelessWidget {
 
 class GamePage extends StatelessWidget {
   GamePage({super.key});
-  // This manages game logic, and is out of scope for this lesson.
+
   final Game _game = Game();
 
   @override
@@ -69,14 +69,19 @@ class GamePage extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         spacing: 5.0,
-      children: [
-        for (final guess in _game.guesses)
-          Row(
-            spacing: 5.0,
-            children: [
-              for (final letter in guess)
-                Tile(letter.char, letter.type),
+        children: [
+          for (final guess in _game.guesses)
+            Row(
+              spacing: 5.0,
+              children: [
+                for (final letter in guess) Tile(letter.char, letter.type),
               ],
+            ),
+          GuessInput(
+            onSubmitGuess: (guess) {
+              // TODO, handle guess
+              print(guess); // Temporary
+            },
           ),
         ],
       ),
@@ -84,12 +89,15 @@ class GamePage extends StatelessWidget {
   }
 }
 
+
 class GuessInput extends StatelessWidget {
   GuessInput({super.key, required this.onSubmitGuess});
 
   final void Function(String) onSubmitGuess;
 
   final TextEditingController _textEditingController = TextEditingController();
+
+  final FocusNode _focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +113,14 @@ class GuessInput extends StatelessWidget {
                   borderRadius: BorderRadius.all(Radius.circular(35)),
                 ),
               ),
-              controller: _textEditingController, // NEW
+              controller: _textEditingController,
+              autofocus: true,
+              focusNode: _focusNode,
+              onSubmitted: (input) {
+                onSubmitGuess(_textEditingController.text.trim());
+                _textEditingController.clear();
+                _focusNode.requestFocus();
+              },
             ),
           ),
         ),
@@ -113,3 +128,4 @@ class GuessInput extends StatelessWidget {
     );
   }
 }
+
